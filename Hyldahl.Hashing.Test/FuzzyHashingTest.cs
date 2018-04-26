@@ -68,12 +68,12 @@ namespace Hyldahl.Hashing.Test
         //
         #endregion
 
-
+      [TestMethod]
         public void Test()
         {
-            SpamSumSignature signature = FuzzyHashing.Calculate(@"G:\ssdeep-2.6\ssdeep-2.6\ssdeep.exe");
+            SpamSumSignature signature = FuzzyHashing.Calculate(@"C:\Users\Jan\Desktop\ssDeep\1.txt");
 
-            SpamSumSignature signatureToCompare = new SpamSumSignature("768:asdfmAAjaHx/4DpIXYSEAdP0Pn0nxqgeFjviVHeFc:asdftSin0nrelviNeK");
+            SpamSumSignature signatureToCompare = new SpamSumSignature("96:tTTDCKPwDS73OqT3JO18zg5KvjtHe/sqEk7ssDd+Wo42vt0vM+T9:JuKPwDNqNO18zgovjt+kqPDdNo42vt0T");
 
             int result = FuzzyHashing.Compare(signature, signatureToCompare);
 

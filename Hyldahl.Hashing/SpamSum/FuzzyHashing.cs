@@ -355,6 +355,17 @@ namespace Hyldahl.Hashing.SpamSum
             }
         }
 
+        public static SpamSumSignature CalculateQuick(string text, Encoding enc = null)
+        {
+            if (enc == null)
+              enc = Encoding.UTF8;
+       
+            using (Stream stream = new MemoryStream(enc.GetBytes(text)))
+            {
+                return Calculate(stream);
+            }
+        }
+
         /*****************************************************
          * HASH COMPARISSON METHODS
          *****************************************************/
