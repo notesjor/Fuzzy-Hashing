@@ -222,7 +222,7 @@ namespace Hyldahl.Hashing.SpamSum
         //    s->block_size = block_size2;
       }
 
-      return (int) score;
+      return (int)score;
     }
 
     private static int ArrayCompare(byte[] array1, int idx1, byte[] array2, int idx2, int rollingWindow)
@@ -231,10 +231,10 @@ namespace Hyldahl.Hashing.SpamSum
 
       for (int a = 0; a < rollingWindow; a++)
       {
-        if (a + idx1 > array1.Length)
+        if (a + idx1 > array1.Length || a + idx1 < 0)
           return 1;
 
-        if (a + idx2 > array2.Length)
+        if (a + idx2 > array2.Length || a + idx2 < 0)
           return 2;
 
         result &= array1[a + idx1] == array2[a + idx2];
@@ -264,7 +264,7 @@ namespace Hyldahl.Hashing.SpamSum
 
     private static uint edit_distn(byte[] s1, uint len1, byte[] s2, uint len2)
     {
-      return (uint) EditDistance.edit_distn(s1, (int) len1, s2, (int) len2);
+      return (uint)EditDistance.edit_distn(s1, (int)len1, s2, (int)len2);
     }
 
     /// <summary>
@@ -279,7 +279,7 @@ namespace Hyldahl.Hashing.SpamSum
       byte[] ret;
       int i, j, len;
 
-      ret = (byte[]) str.Clone();
+      ret = (byte[])str.Clone();
 
       len = str.Length;
 
@@ -402,7 +402,7 @@ namespace Hyldahl.Hashing.SpamSum
     private static uint roll_hash(RollingState roll_state, byte c)
     {
       roll_state.h2 -= roll_state.h1;
-      roll_state.h2 += (uint) ROLLING_WINDOW * c;
+      roll_state.h2 += (uint)ROLLING_WINDOW * c;
 
       roll_state.h1 += c;
       roll_state.h1 -= roll_state.window[roll_state.n % ROLLING_WINDOW];
@@ -441,8 +441,8 @@ namespace Hyldahl.Hashing.SpamSum
       uint len1, len2;
       //int edit_distn(const char *from, int from_len, const char *to, int to_len);
 
-      len1 = (uint) s1.Length;
-      len2 = (uint) s2.Length;
+      len1 = (uint)s1.Length;
+      len2 = (uint)s2.Length;
 
       if (len1 > SPAMSUM_LENGTH || len2 > SPAMSUM_LENGTH) return 0;
 
@@ -509,7 +509,7 @@ namespace Hyldahl.Hashing.SpamSum
          hash which is based on all chacaters in the
          piece of the message between the last reset
          point and this one */
-          ctx.p[ctx.j] = b64[(int) (ctx.h2 % 64)];
+          ctx.p[ctx.j] = b64[(int)(ctx.h2 % 64)];
           if (ctx.j < SPAMSUM_LENGTH - 1)
           {
             /* we can have a problem with the tail
@@ -532,7 +532,7 @@ namespace Hyldahl.Hashing.SpamSum
            size near a block size boundary is greatly reduced. */
         if (ctx.h % (ctx.block_size * 2) == ctx.block_size * 2 - 1)
         {
-          ctx.ret2[ctx.k] = b64[(int) (ctx.h3 % 64)];
+          ctx.ret2[ctx.k] = b64[(int)(ctx.h3 % 64)];
           if (ctx.k < SPAMSUM_LENGTH / 2 - 1)
           {
             ctx.h3 = HASH_INIT;
@@ -556,7 +556,7 @@ namespace Hyldahl.Hashing.SpamSum
       // ctx.ret = new byte[FUZZY_MAX_RESULT];
 
       if (stream != null)
-        ctx.total_chars = (uint) stream.Length; // find_file_size(handle);
+        ctx.total_chars = (uint)stream.Length; // find_file_size(handle);
 
       ctx.block_size = MIN_BLOCKSIZE;
 
@@ -588,12 +588,12 @@ namespace Hyldahl.Hashing.SpamSum
       ctx.h3 = ctx.h2 = HASH_INIT;
       ctx.h = roll_reset(out ctx.roll_state);
 
-      while ((bytes_read = stream.Read(buffer, 0, buffer.Length)) > 0) ss_engine(ctx, buffer, (uint) bytes_read);
+      while ((bytes_read = stream.Read(buffer, 0, buffer.Length)) > 0) ss_engine(ctx, buffer, (uint)bytes_read);
 
       if (ctx.h != 0)
       {
-        ctx.p[ctx.j] = b64[(int) (ctx.h2 % 64)];
-        ctx.ret2[ctx.k] = b64[(int) (ctx.h3 % 64)];
+        ctx.p[ctx.j] = b64[(int)(ctx.h2 % 64)];
+        ctx.ret2[ctx.k] = b64[(int)(ctx.h3 % 64)];
       }
 
       //strcat(ctx.p + ctx.j, ":");
@@ -608,8 +608,8 @@ namespace Hyldahl.Hashing.SpamSum
 
       //ctx.ret = result;
 
-      ctx.signature = new SpamSumSignature(ctx.block_size, GetArray(ctx.p, (int) ctx.j + 1),
-        GetArray(ctx.ret2, (int) ctx.k + 1));
+      ctx.signature = new SpamSumSignature(ctx.block_size, GetArray(ctx.p, (int)ctx.j + 1),
+        GetArray(ctx.ret2, (int)ctx.k + 1));
 
       return 0;
     }
