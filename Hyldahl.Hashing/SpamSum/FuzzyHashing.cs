@@ -53,11 +53,11 @@ namespace Hyldahl.Hashing.SpamSum
       if (null == stream)
         throw new ArgumentNullException("stream");
 
-      bool done = false;
+      var done = false;
 
-      SpamSumContext ctx = new SpamSumContext();
+      var ctx = new SpamSumContext();
 
-      long filepos = stream.Position;
+      var filepos = stream.Position;
 
       ss_init(ctx, stream);
 
@@ -69,7 +69,7 @@ namespace Hyldahl.Hashing.SpamSum
 
         // our blocksize guess may have been way off - repeat if necessary
         if (ctx.block_size > MIN_BLOCKSIZE && ctx.j < SPAMSUM_LENGTH / 2)
-          ctx.block_size = ctx.block_size / 2;
+          ctx.block_size = ctx.block_size                            / 2;
         else
           done = true;
       }
@@ -150,7 +150,7 @@ namespace Hyldahl.Hashing.SpamSum
       // if the blocksizes don't match then we are comparing
       // apples to oranges. This isn't an 'error' per se. We could
       // have two valid signatures, but they can't be compared. 
-      if (block_size1 != block_size2 &&
+      if (block_size1 != block_size2     &&
           block_size1 != block_size2 * 2 &&
           block_size2 != block_size1 * 2)
         return 0;
@@ -222,25 +222,34 @@ namespace Hyldahl.Hashing.SpamSum
         //    s->block_size = block_size2;
       }
 
-      return (int)score;
+      return (int) score;
     }
 
     private static int ArrayCompare(byte[] array1, int idx1, byte[] array2, int idx2, int rollingWindow)
     {
-      bool result = true;
-
-      for (int a = 0; a < rollingWindow; a++)
+      try
       {
-        if (a + idx1 > array1.Length || a + idx1 < 0)
-          return 1;
+        for (var a = 0; a < rollingWindow; a++)
+        {
+          var a1 = a + idx1;
+          var a2 = a + idx2;
 
-        if (a + idx2 > array2.Length || a + idx2 < 0)
-          return 2;
+          if (a1 >= array1.Length)
+            return 1;
 
-        result &= array1[a + idx1] == array2[a + idx2];
+          if (a2 >= array2.Length)
+            return 2;
 
-        if (!result)
-          return -1;
+          if (a1 < 0 || a2 < 0)
+            continue;
+
+          if (array1[a1] != array2[a2])
+            return -1;
+        }
+      }
+      catch
+      {
+        // ginore
       }
 
       return 0;
@@ -248,7 +257,7 @@ namespace Hyldahl.Hashing.SpamSum
 
     private static int Copy(byte[] source, uint sourceIdx, byte[] destination, uint destinationIdx, int maxLength)
     {
-      for (int idx = 0; idx < maxLength; idx++)
+      for (var idx = 0; idx < maxLength; idx++)
       {
         if (sourceIdx + idx >= source.Length)
           return idx;
@@ -264,7 +273,7 @@ namespace Hyldahl.Hashing.SpamSum
 
     private static uint edit_distn(byte[] s1, uint len1, byte[] s2, uint len2)
     {
-      return (uint)EditDistance.edit_distn(s1, (int)len1, s2, (int)len2);
+      return (uint) EditDistance.edit_distn(s1, (int) len1, s2, (int) len2);
     }
 
     /// <summary>
@@ -279,7 +288,7 @@ namespace Hyldahl.Hashing.SpamSum
       byte[] ret;
       int i, j, len;
 
-      ret = (byte[])str.Clone();
+      ret = (byte[]) str.Clone();
 
       len = str.Length;
 
@@ -317,7 +326,7 @@ namespace Hyldahl.Hashing.SpamSum
       if (input.Length == maxLength)
         return input;
 
-      byte[] output = new byte[maxLength];
+      var output = new byte[maxLength];
 
       Copy(input, 0, output, 0, maxLength);
 
@@ -346,7 +355,7 @@ namespace Hyldahl.Hashing.SpamSum
     {
       int i, j;
       int num_hashes;
-      uint[] hashes = new uint[SPAMSUM_LENGTH];
+      var hashes = new uint[SPAMSUM_LENGTH];
 
       /* there are many possible algorithms for common substring
          detection. In this case I am re-using the rolling hash code
@@ -369,16 +378,16 @@ namespace Hyldahl.Hashing.SpamSum
          a direct string comparison */
       for (i = 0; i < s2.Length; i++)
       {
-        uint h = roll_hash(roll_state, s2[i]);
+        var h = roll_hash(roll_state, s2[i]);
         if (i < ROLLING_WINDOW - 1) continue;
         for (j = ROLLING_WINDOW - 1; j < num_hashes; j++)
           if (hashes[j] != 0 && hashes[j] == h)
             if (s2.Length - i - (ROLLING_WINDOW - 1) >= ROLLING_WINDOW &&
                 ArrayCompare(s2,
-                  s2.Length - i - (ROLLING_WINDOW - 1),
-                  s1,
-                  s1.Length - j - (ROLLING_WINDOW - 1),
-                  ROLLING_WINDOW) == 0)
+                             s2.Length - i - (ROLLING_WINDOW - 1),
+                             s1,
+                             s1.Length - j - (ROLLING_WINDOW - 1),
+                             ROLLING_WINDOW) == 0)
               return 1;
       }
 
@@ -402,7 +411,7 @@ namespace Hyldahl.Hashing.SpamSum
     private static uint roll_hash(RollingState roll_state, byte c)
     {
       roll_state.h2 -= roll_state.h1;
-      roll_state.h2 += (uint)ROLLING_WINDOW * c;
+      roll_state.h2 += (uint) ROLLING_WINDOW * c;
 
       roll_state.h1 += c;
       roll_state.h1 -= roll_state.window[roll_state.n % ROLLING_WINDOW];
@@ -441,8 +450,8 @@ namespace Hyldahl.Hashing.SpamSum
       uint len1, len2;
       //int edit_distn(const char *from, int from_len, const char *to, int to_len);
 
-      len1 = (uint)s1.Length;
-      len2 = (uint)s2.Length;
+      len1 = (uint) s1.Length;
+      len2 = (uint) s2.Length;
 
       if (len1 > SPAMSUM_LENGTH || len2 > SPAMSUM_LENGTH) return 0;
 
@@ -479,7 +488,7 @@ namespace Hyldahl.Hashing.SpamSum
       //  printf ("len1: %"PRIu32"  len2: %"PRIu32"\n", len1, len2);
 
       /* when the blocksize is small we don't want to exaggerate the match size */
-      if (score > block_size / MIN_BLOCKSIZE * Math.Min(len1, len2))
+      if (score > block_size               / MIN_BLOCKSIZE * Math.Min(len1, len2))
         score = block_size / MIN_BLOCKSIZE * Math.Min(len1, len2);
       return score;
     }
@@ -509,7 +518,7 @@ namespace Hyldahl.Hashing.SpamSum
          hash which is based on all chacaters in the
          piece of the message between the last reset
          point and this one */
-          ctx.p[ctx.j] = b64[(int)(ctx.h2 % 64)];
+          ctx.p[ctx.j] = b64[(int) (ctx.h2 % 64)];
           if (ctx.j < SPAMSUM_LENGTH - 1)
           {
             /* we can have a problem with the tail
@@ -532,7 +541,7 @@ namespace Hyldahl.Hashing.SpamSum
            size near a block size boundary is greatly reduced. */
         if (ctx.h % (ctx.block_size * 2) == ctx.block_size * 2 - 1)
         {
-          ctx.ret2[ctx.k] = b64[(int)(ctx.h3 % 64)];
+          ctx.ret2[ctx.k] = b64[(int) (ctx.h3 % 64)];
           if (ctx.k < SPAMSUM_LENGTH / 2 - 1)
           {
             ctx.h3 = HASH_INIT;
@@ -556,7 +565,7 @@ namespace Hyldahl.Hashing.SpamSum
       // ctx.ret = new byte[FUZZY_MAX_RESULT];
 
       if (stream != null)
-        ctx.total_chars = (uint)stream.Length; // find_file_size(handle);
+        ctx.total_chars = (uint) stream.Length; // find_file_size(handle);
 
       ctx.block_size = MIN_BLOCKSIZE;
 
@@ -581,19 +590,19 @@ namespace Hyldahl.Hashing.SpamSum
       //memset(ctx->p, 0, SPAMSUM_LENGTH+1);
       //memset(ctx->ret2, 0, sizeof(ctx->ret2));
 
-      ctx.p = new byte[SPAMSUM_LENGTH + 1];
+      ctx.p = new byte[SPAMSUM_LENGTH        + 1];
       ctx.ret2 = new byte[SPAMSUM_LENGTH / 2 + 1];
 
       ctx.k = ctx.j = 0;
       ctx.h3 = ctx.h2 = HASH_INIT;
       ctx.h = roll_reset(out ctx.roll_state);
 
-      while ((bytes_read = stream.Read(buffer, 0, buffer.Length)) > 0) ss_engine(ctx, buffer, (uint)bytes_read);
+      while ((bytes_read = stream.Read(buffer, 0, buffer.Length)) > 0) ss_engine(ctx, buffer, (uint) bytes_read);
 
       if (ctx.h != 0)
       {
-        ctx.p[ctx.j] = b64[(int)(ctx.h2 % 64)];
-        ctx.ret2[ctx.k] = b64[(int)(ctx.h3 % 64)];
+        ctx.p[ctx.j] = b64[(int) (ctx.h2    % 64)];
+        ctx.ret2[ctx.k] = b64[(int) (ctx.h3 % 64)];
       }
 
       //strcat(ctx.p + ctx.j, ":");
@@ -608,8 +617,8 @@ namespace Hyldahl.Hashing.SpamSum
 
       //ctx.ret = result;
 
-      ctx.signature = new SpamSumSignature(ctx.block_size, GetArray(ctx.p, (int)ctx.j + 1),
-        GetArray(ctx.ret2, (int)ctx.k + 1));
+      ctx.signature = new SpamSumSignature(ctx.block_size, GetArray(ctx.p, (int) ctx.j + 1),
+                                           GetArray(ctx.ret2, (int) ctx.k              + 1));
 
       return 0;
     }
@@ -633,9 +642,9 @@ namespace Hyldahl.Hashing.SpamSum
 
     private class RollingState
     {
+      public readonly byte[] window;
       public uint h1, h2, h3;
       public uint n;
-      public readonly byte[] window;
 
       public RollingState()
       {

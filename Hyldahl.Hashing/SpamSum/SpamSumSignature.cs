@@ -22,8 +22,8 @@ namespace Hyldahl.Hashing.SpamSum
       if (string.IsNullOrEmpty(signature))
         throw new ArgumentException("Signature string cannot be null or empty.", "signature");
 
-      int idx1 = signature.IndexOf(':');
-      int idx2 = signature.IndexOf(':', idx1 + 1);
+      var idx1 = signature.IndexOf(':');
+      var idx2 = signature.IndexOf(':', idx1 + 1);
 
       if (idx1 < 0)
         throw new ArgumentException("Signature is not valid.", "signature");
@@ -79,11 +79,11 @@ namespace Hyldahl.Hashing.SpamSum
       if (HashPart2.Length != other.HashPart2.Length)
         return false;
 
-      for (int idx = 0; idx < HashPart1.Length; idx++)
+      for (var idx = 0; idx < HashPart1.Length; idx++)
         if (HashPart1[idx] != other.HashPart1[idx])
           return false;
 
-      for (int idx = 0; idx < HashPart2.Length; idx++)
+      for (var idx = 0; idx < HashPart2.Length; idx++)
         if (HashPart2[idx] != other.HashPart2[idx])
           return false;
 
@@ -118,8 +118,8 @@ namespace Hyldahl.Hashing.SpamSum
 
     public override string ToString()
     {
-      string hashText1 = Encoding.ASCII.GetString(HashPart1);
-      string hashText2 = Encoding.ASCII.GetString(HashPart2);
+      var hashText1 = Encoding.ASCII.GetString(HashPart1);
+      var hashText2 = Encoding.ASCII.GetString(HashPart2);
       return string.Format("{0}:{1}:{2}", BlockSize, hashText1, hashText2);
     }
   }

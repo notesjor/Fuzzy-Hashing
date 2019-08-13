@@ -57,7 +57,7 @@ namespace Hyldahl.Hashing.SpamSum
     // #define swap_int(x,y)  (_iswap = (x), (x) = (y), (y) = _iswap)
     private static void swap_int(ref int x, ref int y)
     {
-      int _iswap = x;
+      var _iswap = x;
       x = y;
       y = _iswap;
     }
@@ -65,7 +65,7 @@ namespace Hyldahl.Hashing.SpamSum
     // #define swap_char(x,y) (_cswap = (x), (x) = (y), (y) = _cswap)
     private static void swap_char(ref byte[] x, ref byte[] y)
     {
-      byte[] _cswap = x;
+      var _cswap = x;
       x = y;
       y = _cswap;
     }
@@ -73,17 +73,17 @@ namespace Hyldahl.Hashing.SpamSum
     //#define min3(x,y,z) (_mx = (x), _my = (y), _mz = (z), (_mx < _my ? (_mx < _mz ? _mx : _mz) : (_mz < _my) ? _mz : _my))
     private static int min3(int x, int y, int z)
     {
-      int _mx = x;
-      int _my = y;
-      int _mz = z;
-      return _mx < _my ? (_mx < _mz ? _mx : _mz) : _mz < _my ? _mz : _my;
+      var _mx = x;
+      var _my = y;
+      var _mz = z;
+      return _mx < _my ? _mx < _mz ? _mx : _mz : _mz < _my ? _mz : _my;
     }
 
     //#define min2(x,y) (_mx = (x), _my = (y), (_mx < _my ? _mx : _my))
     private static int min2(int x, int y)
     {
-      int _mx = x;
-      int _my = y;
+      var _mx = x;
+      var _my = y;
       return _mx < _my ? _mx : _my;
     }
 
@@ -119,7 +119,7 @@ namespace Hyldahl.Hashing.SpamSum
       int[] buffer; /* pointer to storage for one row
                                            of the d.p. array */
 
-      int[] store = new int[THRESHOLD / sizeof(int)];
+      var store = new int[THRESHOLD / sizeof(int)];
       /* a small amount of static
          storage, to be used when the
          input strings are small enough */
@@ -139,10 +139,10 @@ namespace Hyldahl.Hashing.SpamSum
       radix = 2 * from_len + 3;
 
 #if(TRN_SPEEDUP)
-      int ins = 1;
-      int del = 1;
-      int ch = 3;
-      int swap_cost = 5;
+      var ins = 1;
+      var del = 1;
+      var ch = 3;
+      var swap_cost = 5;
 #else
             ins = insert_cost;
             del = delete_cost;
@@ -212,10 +212,10 @@ namespace Hyldahl.Hashing.SpamSum
       arDelegate ar = delegate(int x, int y, int idx)
       {
         return x == 0
-          ? y * del
-          : (y == 0
-            ? x * ins
-            : buffer[mod(idx)]);
+                 ? y * del
+                 : y == 0
+                   ? x * ins
+                   : buffer[mod(idx)];
       };
 
       doubleIntDelegate NW = delegate(int x, int y) { return ar(x, y, index + from_len + 2); };
@@ -259,9 +259,9 @@ namespace Hyldahl.Hashing.SpamSum
       for (col = 1; col < from_len; col++)
       {
         buffer[index] = min3(
-          col * del + (from[col] == to[0] ? 0 : ch),
-          (col + 1) * del + ins,
-          buffer[index - 1] + del);
+                             col       * del   + (from[col] == to[0] ? 0 : ch),
+                             (col + 1) * del   + ins,
+                             buffer[index - 1] + del);
 #if(TRN_SPEEDUP)
         if (buffer[index] < low)
           low = buffer[index];
@@ -284,11 +284,11 @@ namespace Hyldahl.Hashing.SpamSum
         for (col = 0; col < from_len; col++)
         {
           buffer[index] = min3(
-            NW(row, col) + (from[col] == to[row] ? 0 : ch),
-            N(row, col + 1) + ins,
-            W(row + 1, col) + del);
+                               NW(row, col)         + (from[col] == to[row] ? 0 : ch),
+                               N(row, col + 1)      + ins,
+                               W(row      + 1, col) + del);
 
-          if (from[col] == to[row - 1] && col > 0 && from[col - 1] == to[row])
+          if (from[col] == to[row - 1] && col > 0 && from[col          - 1] == to[row])
             buffer[index] = min2(buffer[index], NNWW(row - 1, col - 1) + swap_cost);
 
 #if(DEBUG_EDITDIST)
