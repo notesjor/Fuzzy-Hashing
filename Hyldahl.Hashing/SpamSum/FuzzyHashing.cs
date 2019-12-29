@@ -1,7 +1,11 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+
+#endregion
 
 namespace Hyldahl.Hashing.SpamSum
 {
@@ -41,6 +45,36 @@ namespace Hyldahl.Hashing.SpamSum
     static FuzzyHashing()
     {
       b64 = Encoding.ASCII.GetBytes(b64String);
+    }
+
+    private static int ArrayCompare(byte[] array1, int idx1, byte[] array2, int idx2, int rollingWindow)
+    {
+      try
+      {
+        for (var a = 0; a < rollingWindow; a++)
+        {
+          var a1 = a + idx1;
+          var a2 = a + idx2;
+
+          if (a1 >= array1.Length)
+            return 1;
+
+          if (a2 >= array2.Length)
+            return 2;
+
+          if (a1 < 0 || a2 < 0)
+            continue;
+
+          if (array1[a1] != array2[a2])
+            return -1;
+        }
+      }
+      catch
+      {
+        // ginore
+      }
+
+      return 0;
     }
 
     /// <summary>
@@ -223,36 +257,6 @@ namespace Hyldahl.Hashing.SpamSum
       }
 
       return (int) score;
-    }
-
-    private static int ArrayCompare(byte[] array1, int idx1, byte[] array2, int idx2, int rollingWindow)
-    {
-      try
-      {
-        for (var a = 0; a < rollingWindow; a++)
-        {
-          var a1 = a + idx1;
-          var a2 = a + idx2;
-
-          if (a1 >= array1.Length)
-            return 1;
-
-          if (a2 >= array2.Length)
-            return 2;
-
-          if (a1 < 0 || a2 < 0)
-            continue;
-
-          if (array1[a1] != array2[a2])
-            return -1;
-        }
-      }
-      catch
-      {
-        // ginore
-      }
-
-      return 0;
     }
 
     private static int Copy(byte[] source, uint sourceIdx, byte[] destination, uint destinationIdx, int maxLength)
@@ -649,7 +653,7 @@ namespace Hyldahl.Hashing.SpamSum
       public RollingState()
       {
         window = new byte[ROLLING_WINDOW];
-        h1 = h2 = h3 = n = default(uint);
+        h1 = h2 = h3 = n = default;
       }
     }
 
@@ -673,8 +677,8 @@ namespace Hyldahl.Hashing.SpamSum
         ret2 = new byte[SPAMSUM_LENGTH / 2 + 1];
 
         //ret = p = default(byte[]);
-        p = default(byte[]);
-        total_chars = h = h2 = h3 = j = n = i = k = block_size = default(uint);
+        p = default;
+        total_chars = h = h2 = h3 = j = n = i = k = block_size = default;
       }
     }
   }
