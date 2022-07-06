@@ -94,10 +94,6 @@ namespace Hyldahl.Hashing.SpamSum
         static int swap_cost = 1;
 #endif
 
-    private static int _iswap; /* swap_int temp variable */
-    private static char _cswap; /* swap_char temp variable */
-    private static int _mx, _my, _mz; /* min2, min3 temp variables */
-
     private delegate int arDelegate(int x, int y, int index);
 
     private delegate int doubleIntDelegate(int x, int y);
@@ -162,10 +158,7 @@ namespace Hyldahl.Hashing.SpamSum
 
       /* Allocate the array storage (from the heap if necessary) */
 
-      if (from_len <= STRLENTHRESHOLD)
-        buffer = store;
-      else
-        buffer = new int[radix];
+      buffer = from_len <= STRLENTHRESHOLD ? store : new int[radix];
 
       /* Here's where the fun begins.  We will find the minimum edit distance
           using dynamic programming.  We only need to store two rows of the matrix
@@ -288,7 +281,7 @@ namespace Hyldahl.Hashing.SpamSum
                                N(row, col + 1)      + ins,
                                W(row      + 1, col) + del);
 
-          if (from[col] == to[row - 1] && col > 0 && from[col          - 1] == to[row])
+          if (from[col] == to[row                                      - 1] && col > 0 && from[col - 1] == to[row])
             buffer[index] = min2(buffer[index], NNWW(row - 1, col - 1) + swap_cost);
 
 #if(DEBUG_EDITDIST)

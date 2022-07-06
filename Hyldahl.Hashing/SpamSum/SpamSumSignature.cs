@@ -103,7 +103,7 @@ namespace Hyldahl.Hashing.SpamSum
       if (!(obj is SpamSumSignature))
         return false;
 
-      return Equals((SpamSumSignature) obj);
+      return Equals((SpamSumSignature)obj);
     }
 
     /*****************************************************
@@ -115,10 +115,7 @@ namespace Hyldahl.Hashing.SpamSum
     /// </summary>
     /// <param name="signature">The signature.</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator SpamSumSignature(string signature)
-    {
-      return new SpamSumSignature(signature);
-    }
+    public static implicit operator SpamSumSignature(string signature) => new SpamSumSignature(signature);
 
     public override string ToString()
     {
