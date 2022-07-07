@@ -135,12 +135,31 @@ namespace Hyldahl.Hashing.SpamSum
       using (Stream stream = new MemoryStream(enc.GetBytes(text))) return Calculate(stream);
     }
 
+    public static double Compare2(SpamSumSignature signature1, SpamSumSignature signature2)
+    {
+      if(signature1.BlockSize != signature2.BlockSize) 
+        return 0;
+
+      var max = signature1.HashPart1.Length 
+              + signature1.HashPart2.Length 
+              + signature2.HashPart1.Length 
+              + signature2.HashPart2.Length;
+
+      var dist = EditDistance.edit_distn(signature1.HashPart1, signature1.HashPart1.Length, signature2.HashPart1,
+                                         signature2.HashPart1.Length)
+               + EditDistance.edit_distn(signature1.HashPart2, signature1.HashPart2.Length, signature2.HashPart2,
+                                         signature2.HashPart2.Length);
+
+      return 100.0 - ((((double)dist) / max) * 100.0);
+    }
+
     /// <summary>
     ///   given two spamsum signature return a value indicating the degree to which they match.
     /// </summary>
     /// <param name="signature1">The first signature.</param>
     /// <param name="signature2">The second signature.</param>
     /// <returns></returns>
+    [Obsolete("Use Compare2")]
     public static int Compare(SpamSumSignature signature1, SpamSumSignature signature2)
     {
       uint block_size1, block_size2;
